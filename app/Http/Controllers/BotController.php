@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Bot;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -27,14 +28,16 @@ class BotController extends Controller
 
 
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+    public function receive(Request $request)
     {
-        //
+        $sender = $request['entry'][0]['messaging'][0]['sender']['id'];
+        $message = $request['entry'][0]['messaging'][0]['message']['text'];
+
+        $bot = new Bot();
+        $bot->sender = $sender;
+        $bot->text = $message;
+        $bot->save();
     }
 
     /**

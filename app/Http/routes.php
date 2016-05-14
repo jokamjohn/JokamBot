@@ -22,6 +22,7 @@ Route::auth();
 Route::group( [ "middleware" => "web"], function() {
    
     Route::get("/botwebhook", "BotController@mBot");
+    Route::post("/botwebhook", "BotController@receive");
     
 });
 
