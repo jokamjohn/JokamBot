@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Bot;
-use Illuminate\Http\Request;
-
 use App\Http\Requests;
+use App\Messenger;
+use Illuminate\Http\Request;
 
 class BotController extends Controller
 {
@@ -17,12 +16,9 @@ class BotController extends Controller
      */
     public function mBot(Request $request)
     {
-        if ($request['hub_verify_token'] == 2244 )
-        {
+        if ($request['hub_verify_token'] == 2244) {
             return response($request->get('hub_challenge'));
-        }
-
-        else {
+        } else {
             return response("Error has occurred");
         }
 
@@ -31,13 +27,28 @@ class BotController extends Controller
 
     public function receive(Request $request)
     {
-        $sender = $request['entry'][0]['messaging'][0]['sender']['id'];
-        $message = $request['entry'][0]['messaging'][0]['message']['text'];
+        //Convert the json into an object
+        $object = json_decode(json_encode($request->all()));
+        $entry = $object->entry;
 
-        $bot = new Bot();
-        $bot->sender = $sender;
-        $bot->text = $message;
-        $bot->save();
+        foreach ($entry as $value) {
+
+            $messenger = new Messenger();
+
+            $messenger->pageId = $value->id;
+            $messenger->timestamp = $value->time;
+
+            foreach ($value->messaging as $message) {
+                $messenger->senderId = $message->sender->id;
+
+                $messenger->recipientId = $message->recipient->id;
+
+                $messenger->message = $message->message->text;
+
+                $messenger->save();
+            }
+        }
+        
     }
 
     /**
@@ -53,7 +64,7 @@ class BotController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -64,7 +75,7 @@ class BotController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -75,7 +86,7 @@ class BotController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -86,8 +97,8 @@ class BotController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -98,7 +109,7 @@ class BotController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
