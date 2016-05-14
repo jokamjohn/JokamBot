@@ -16,7 +16,7 @@ class BotController extends Controller
      */
     public function mBot(Request $request)
     {
-        if ($request->get('hub.verify_token') == 2244 )
+        if ($request->get('hub.verify_token') === 2244 )
         {
             return response($request->get('hub.challenge'));
         }
